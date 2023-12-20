@@ -1,0 +1,21 @@
+--- a/llm/llama.go
++++ b/llm/llama.go
+@@ -55,7 +55,6 @@
+ ws ::= ([ \t\n] ws)?
+ `
+ 
+-//go:embed llama.cpp/*/build/*/bin/*
+ var llamaCppEmbed embed.FS
+ 
+ type ModelRunner struct {
+@@ -65,6 +64,10 @@
+ }
+ 
+ func chooseRunners(workDir, runnerType string) []ModelRunner {
++	return []ModelRunner{
++		{Path: "@llamaCppServer@"},
++	}
++
+ 	buildPath := path.Join("llama.cpp", runnerType, "build")
+ 	var runners []ModelRunner
+ 
