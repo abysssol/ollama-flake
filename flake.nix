@@ -19,11 +19,11 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, llama-cpp, ollama }:
+  outputs = { nixpkgs, utils, gomod2nix, llama-cpp, ollama, ... }:
     (utils.lib.eachDefaultSystem (system:
       let
         name = "ollama";
-        version = "master";
+        version = "0.1.17-dev";
         buildOllama = api:
           gomod2nix.legacyPackages.${system}.buildGoApplication {
             inherit system;
