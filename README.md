@@ -31,10 +31,11 @@ The available apis:
 - openblas: cpu only  
   llama-cpp sets this as the default, overridden here
 - cuda: nvidia gpu only  
-  hasn't been tested to build or run with this flake
+  hasn't been tested with nvidia hardware, may or may not work
 - rocm: amd gpu only  
-  broken; builds and runs, but server returns error referencing cuda when loading model  
-  probably a problem with ollama not supporting rocm
+  broken; server returns error in ggml-cuda.cu when loading model  
+  probably a problem with ollama not supporting rocm, see issue [#738](
+  https://github.com/jmorganca/ollama/issues/738)
 
 The default api is opencl:
 ``` shell
