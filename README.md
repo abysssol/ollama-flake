@@ -26,14 +26,14 @@ Multiple packages are available for the different api backends supported by
 [llama-cpp](https://github.com/ggerganov/llama.cpp).
 
 The available apis:
-- opencl: cpu or gpu
+- opencl: cpu or gpu  
   default
-- openblas: cpu only
+- openblas: cpu only  
   llama-cpp sets this as the default, overridden here
-- cuda: nvidia gpu only
+- cuda: nvidia gpu only  
   hasn't been tested to build or run with this flake
-- rocm: amd gpu only
-  broken; builds and runs, but server returns error referencing cuda when loading model
+- rocm: amd gpu only  
+  broken; builds and runs, but server returns error referencing cuda when loading model  
   probably a problem with ollama not supporting rocm
 
 The default api is opencl:
