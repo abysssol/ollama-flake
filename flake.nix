@@ -24,6 +24,7 @@
       let
         name = "ollama";
         version = "0.1.17-dev";
+        pkgs = nixpkgs.legacyPackages.${system};
         buildOllama = api:
           gomod2nix.legacyPackages.${system}.buildGoApplication {
             inherit system;
@@ -57,7 +58,7 @@
           rocm = buildOllama "rocm";
         };
 
-        devShells.default = nixpkgs.lib.mkShell {
+        devShells.default = pkgs.mkShell {
           NIX_PATH = "nixpkgs=${nixpkgs}";
           OLLAMA_PATH = ollama;
           nativeBuildInputs = [
