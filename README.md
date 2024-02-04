@@ -4,6 +4,14 @@ A flake following the `main` branch of [ollama](https://github.com/jmorganca/oll
 It's purpose is to build the most recent version supporting new models until
 the version in [nixpkgs](https://github.com/nixos/nixpkgs) is updated.
 
+### Contents
+- [Install](#install)
+- [Backend API](#backend-api)
+- [Update](#update)
+- [Remove](#remove)
+- [License](#license)
+  - [Contribution](#contribution)
+
 
 ## Install
 
@@ -113,8 +121,7 @@ https://creativecommons.org/publicdomain/zero/1.0).
 Read the CC0 in the [LICENSE file](./LICENSE) or [online](
 https://creativecommons.org/publicdomain/zero/1.0/legalcode).
 
-
-## Contribution
+### Contribution
 
 Any contribution submitted for inclusion in the project is subject to the [CC0](./LICENSE);
 that is, it is released into the public domain and all copyright to it is relinquished.
