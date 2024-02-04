@@ -56,21 +56,21 @@ Use as an input in another flake:
 Multiple packages are available for the different backend implementations supported by ollama.
 
 The available APIs:
-- `cpu`: default, CPU implementation
+- `cpu`: default CPU implementation
+  ``` shell
+  nix profile install github:abysssol/ollama-flake#cpu
+  ```
 - `rocm`: supported by modern AMD GPUs
+  ``` shell
+  nix profile install github:abysssol/ollama-flake#rocm
+  ```
 
-All available packages:
-``` shell
-nix profile install github:abysssol/ollama-flake#cpu
-nix profile install github:abysssol/ollama-flake#rocm
-```
-
-The default api is `cpu`:
+The default API is `cpu`:
 ``` shell
 # both of these are the default package, and are equivalent
 nix profile install github:abysssol/ollama-flake
 nix profile install github:abysssol/ollama-flake#default
-# both of the above are equivalent to the below
+# both of the above are equivalent to the one below
 nix profile install github:abysssol/ollama-flake#cpu
 ```
 
