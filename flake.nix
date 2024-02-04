@@ -1,4 +1,7 @@
 {
+  description =
+    "ollama: Get up and running with Llama 2, Mistral, and other large language models locally";
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     utils.url = "github:numtide/flake-utils";
@@ -8,38 +11,93 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "utils";
     };
-    llama-cpp = {
-      url = "github:ggerganov/llama.cpp";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
-    };
     ollama = {
-      url = "github:jmorganca/ollama";
+      url = "git+https://github.com/jmorganca/ollama?submodules=1";
       flake = false;
     };
   };
 
-  outputs = { nixpkgs, utils, gomod2nix, llama-cpp, ollama, ... }:
+  outputs = { self, nixpkgs, utils, gomod2nix, ollama, ... }:
     (utils.lib.eachDefaultSystem (system:
       let
         name = "ollama";
-        version = "0.1.17-dev";
-        pkgs = nixpkgs.legacyPackages.${system};
-        buildOllama = api:
-          gomod2nix.legacyPackages.${system}.buildGoApplication {
-            inherit system;
-            name = "${name}-${version}";
+        version = "0.1.23-dev";
 
+        pkgs = nixpkgs.legacyPackages.${system};
+        inherit (pkgs) lib rocmPackages;
+
+        rocmClang = derivation {
+          name = "rocm-clang";
+          inherit system;
+          builder = "${pkgs.bash}/bin/bash";
+          PATH = lib.makeBinPath [ pkgs.coreutils ];
+          args = [
+            "-c"
+            ''
+              mkdir "$out"
+              ln -s '${rocmPackages.llvm.clang}' "$out/llvm"
+            ''
+          ];
+        };
+        rocmPath = pkgs.buildEnv {
+          name = "rocm-llvm";
+          paths = [
+            rocmClang
+            rocmPackages.rocm-device-libs
+          ];
+        };
+
+        buildModes = {
+          cpu = { };
+
+          rocm = {
+            buildInputs = [
+              rocmPackages.hipblas
+              rocmPackages.rocblas
+              rocmPackages.clr
+              rocmPackages.rocsolver
+              rocmPackages.rocsparse
+              pkgs.libdrm
+            ];
+            postFixup =
+              let
+                wrapperLibs = lib.makeLibraryPath [ rocmPackages.rocm-smi ];
+              in
+              ''
+                mv "$out/bin/${name}" "$out/bin/.${name}-unwrapped"
+                makeWrapper "$out/bin/.${name}-unwrapped" "$out/bin/${name}" \
+                  --inherit-argv0 \
+                  --suffix LD_LIBRARY_PATH : "${wrapperLibs}"
+              '';
+            ROCM_PATH = "${rocmPath}";
+            CLBlast_DIR = "${pkgs.clblast}/lib/cmake/CLBlast";
+          };
+        };
+
+        buildOllama = mode:
+          gomod2nix.legacyPackages.${system}.buildGoApplication (buildModes.${mode} // {
+            name = "${name}-${version}";
+            inherit system;
             src = ollama;
             pwd = ./.;
 
+            nativeBuildInputs = [
+              pkgs.cmake
+              pkgs.makeWrapper
+            ];
             patches = [
-              ./disable-gqa.patch
-              ./set-llamacpp-path.patch
+              ./patch/disable-git-patching.patch
+              ./patch/move-cache.patch
+              ./patch/server-shutdown.patch
+              ./patch/shutdown-utils.patch
             ];
             postPatch = ''
-              substituteInPlace llm/llama.go \
-                --subst-var-by llamaCppServer "${llama-cpp.packages.${system}.${api}}/bin/llama-server"
+              substituteInPlace llm/generate/gen_linux.sh \
+                --subst-var-by cmakelistsPatch '${./patch/cmake-include.patch}'
+            '';
+            preBuild = ''
+              export GOCACHE="$TMP/.cache/go-build"
+              go generate ./...
             '';
             ldflags = [
               "-s"
@@ -47,23 +105,20 @@
               "-X=github.com/jmorganca/ollama/version.Version=0.0.0"
               "-X=github.com/jmorganca/ollama/server.mode=release"
             ];
-          };
+          });
       in
       {
         packages = {
-          default = buildOllama "opencl";
-          openblas = buildOllama "default";
-          opencl = buildOllama "opencl";
-          cuda = buildOllama "cuda";
+          default = self.packages.${system}.cpu;
+          cpu = buildOllama "cpu";
           rocm = buildOllama "rocm";
         };
 
         devShells.default = pkgs.mkShell {
-          NIX_PATH = "nixpkgs=${nixpkgs}";
-          OLLAMA_PATH = ollama;
           nativeBuildInputs = [
-            gomod2nix.packages.${system}.default
-            (gomod2nix.legacyPackages.${system}.mkGoEnv { pwd = ollama; })
+            (pkgs.writeShellScriptBin "gomod2nix-generate" ''
+              exec ${gomod2nix.packages.${system}.default}/bin/gomod2nix generate --dir ${ollama} --outdir .
+            '')
           ];
         };
       }));

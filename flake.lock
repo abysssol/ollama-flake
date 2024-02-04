@@ -10,49 +10,26 @@
         ]
       },
       "locked": {
-        "lastModified": 1701687253,
-        "narHash": "sha256-qJCMxIKWXonJODPF2oV7mCd0xu7VYVenTucrY0bizto=",
+        "lastModified": 1705314449,
+        "narHash": "sha256-yfQQ67dLejP0FLK76LKHbkzcQqNIrux6MFe32MMFGNQ=",
         "owner": "tweag",
         "repo": "gomod2nix",
-        "rev": "001bbfa22e2adeb87c34c6015e5694e88721cabe",
+        "rev": "30e3c3a9ec4ac8453282ca7f67fca9e1da12c3e6",
         "type": "github"
       },
       "original": {
         "owner": "tweag",
         "repo": "gomod2nix",
-        "type": "github"
-      }
-    },
-    "llama-cpp": {
-      "inputs": {
-        "flake-utils": [
-          "utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1703083282,
-        "narHash": "sha256-xVG51Aq3KlooOhXjV4H5mbTeYjpzHtEY7vwcMCHNqXc=",
-        "owner": "ggerganov",
-        "repo": "llama.cpp",
-        "rev": "799fc2268989482054944c902874cca76337580f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ggerganov",
-        "repo": "llama.cpp",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1698318101,
-        "narHash": "sha256-gUihHt3yPD7bVqg+k/UVHgngyaJ3DMEBchbymBMvK1E=",
+        "lastModified": 1706683685,
+        "narHash": "sha256-FtPPshEpxH/ewBOsdKBNhlsL2MLEFv1hEnQ19f/bFsQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "63678e9f3d3afecfeafa0acead6239cdb447574c",
+        "rev": "5ad9903c16126a7d949101687af0aa589b1d7d3d",
         "type": "github"
       },
       "original": {
@@ -65,23 +42,24 @@
     "ollama": {
       "flake": false,
       "locked": {
-        "lastModified": 1703080073,
-        "narHash": "sha256-BR7mWJ02KXf2iAUmops7imj9zcLevJJCzuMp29uvwrg=",
-        "owner": "jmorganca",
-        "repo": "ollama",
-        "rev": "df06812494a58219c7890bd52bc8a8f00fbe9f79",
-        "type": "github"
+        "lastModified": 1706905044,
+        "narHash": "sha256-+DABF5c/QpoCdu9aQvUE1kDP+sG7PssPSgvH8YfLycE=",
+        "ref": "refs/heads/main",
+        "rev": "f0e9496c85f67cdcba03a6e518117a93c69ae8f0",
+        "revCount": 1944,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/jmorganca/ollama"
       },
       "original": {
-        "owner": "jmorganca",
-        "repo": "ollama",
-        "type": "github"
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/jmorganca/ollama"
       }
     },
     "root": {
       "inputs": {
         "gomod2nix": "gomod2nix",
-        "llama-cpp": "llama-cpp",
         "nixpkgs": "nixpkgs",
         "ollama": "ollama",
         "utils": "utils"
@@ -107,11 +85,11 @@
         "systems": "systems"
       },
       "locked": {
-        "lastModified": 1701680307,
-        "narHash": "sha256-kAuep2h5ajznlPMD9rnQyffWG8EM/C73lejGofXvdM8=",
+        "lastModified": 1705309234,
+        "narHash": "sha256-uNRRNRKmJyCRC/8y1RqBkqWBLM034y4qN7EprSdmgyA=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "4022d587cbbfd70fe950c1e2083a02621806a725",
+        "rev": "1ef2e671c3b0c19053962c07dbda38332dcebf26",
         "type": "github"
       },
       "original": {
