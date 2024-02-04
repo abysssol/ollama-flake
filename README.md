@@ -75,6 +75,24 @@ nix profile install github:abysssol/ollama-flake#cpu
 ```
 
 
+## Update
+
+Find the index of the package to update:
+``` shell
+nix profile list
+```
+
+Update the package at `index`:
+``` shell
+nix profile upgrade $index
+```
+
+If nix is hesitant to download updates, force nix to download new files with `--refresh`:
+``` shell
+nix profile upgrade --refresh $index
+```
+
+
 ## Remove
 
 Find the index of the package to remove:
