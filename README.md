@@ -10,7 +10,6 @@ the version in [nixpkgs](https://github.com/nixos/nixpkgs) is updated.
 - [Update](#update)
 - [Remove](#remove)
 - [License](#license)
-  - [Contribution](#contribution)
 
 
 ## Install
