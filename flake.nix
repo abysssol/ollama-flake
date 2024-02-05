@@ -93,6 +93,10 @@
               "-X=github.com/jmorganca/ollama/server.mode=release"
             ];
           });
+
+        gomod2nixGenerate = pkgs.writeShellScriptBin "gomod2nix-generate" ''
+          exec ${gomod2nix.packages.${system}.default}/bin/gomod2nix generate --dir ${ollama} --outdir .
+        '';
       in
       {
         packages = {
@@ -102,11 +106,7 @@
         };
 
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [
-            (pkgs.writeShellScriptBin "gomod2nix-generate" ''
-              exec ${gomod2nix.packages.${system}.default}/bin/gomod2nix generate --dir ${ollama} --outdir .
-            '')
-          ];
+          nativeBuildInputs = [ gomod2nixGenerate ];
         };
       }));
 }
