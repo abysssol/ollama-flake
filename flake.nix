@@ -37,6 +37,12 @@
           ];
         };
 
+        makeWrapper = wrapperLibs: ''
+          mv "$out/bin/${name}" "$out/bin/.${name}-unwrapped"
+          makeWrapper "$out/bin/.${name}-unwrapped" "$out/bin/${name}" \
+            --inherit-argv0 \
+            --suffix LD_LIBRARY_PATH : "${lib.makeLibraryPath wrapperLibs}"
+        '';
         buildModes = {
           cpu = { };
 
@@ -49,16 +55,7 @@
               rocmPackages.rocsparse
               pkgs.libdrm
             ];
-            postFixup =
-              let
-                wrapperLibs = lib.makeLibraryPath [ rocmPackages.rocm-smi ];
-              in
-              ''
-                mv "$out/bin/${name}" "$out/bin/.${name}-unwrapped"
-                makeWrapper "$out/bin/.${name}-unwrapped" "$out/bin/${name}" \
-                  --inherit-argv0 \
-                  --suffix LD_LIBRARY_PATH : "${wrapperLibs}"
-              '';
+            postFixup = makeWrapper [ rocmPackages.rocm-smi ];
             ROCM_PATH = "${rocmPath}";
             CLBlast_DIR = "${pkgs.clblast}/lib/cmake/CLBlast";
           };
