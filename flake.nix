@@ -26,18 +26,8 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs) lib rocmPackages;
 
-        rocmClang = derivation {
-          name = "rocm-clang";
-          inherit system;
-          builder = "${pkgs.bash}/bin/bash";
-          PATH = lib.makeBinPath [ pkgs.coreutils ];
-          args = [
-            "-c"
-            ''
-              mkdir "$out"
-              ln -s '${rocmPackages.llvm.clang}' "$out/llvm"
-            ''
-          ];
+        rocmClang = pkgs.linkFarm "rocm-clang" {
+          llvm = rocmPackages.llvm.clang;
         };
         rocmPath = pkgs.buildEnv {
           name = "rocm-llvm";
