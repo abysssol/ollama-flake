@@ -6,7 +6,7 @@ the version in [nixpkgs](https://github.com/nixos/nixpkgs) is updated.
 
 ### Contents
 - [Install](#install)
-- [Backend API](#backend-api)
+  - [Backend API](#backend-api)
 - [Update](#update)
 - [Remove](#remove)
 - [License](#license)
@@ -57,8 +57,7 @@ Use as an input in another flake:
 };
 ```
 
-
-## Backend API
+### Backend API
 
 Multiple packages are available for the different backend implementations supported by ollama.
 
