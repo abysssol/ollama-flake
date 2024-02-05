@@ -6,7 +6,7 @@ the version in [nixpkgs](https://github.com/nixos/nixpkgs) is updated.
 
 ### Contents
 - [Install](#install)
-  - [Backend API](#backend-api)
+  - [Backend](#backend)
 - [Update](#update)
 - [Remove](#remove)
 - [License](#license)
@@ -57,11 +57,11 @@ Use as an input in another flake:
 };
 ```
 
-### Backend API
+### Backend
 
 Multiple packages are available for the different backend implementations supported by ollama.
 
-The available APIs:
+The available options:
 - `cpu`: default CPU implementation
   ``` shell
   nix profile install github:abysssol/ollama-flake#cpu
@@ -71,7 +71,7 @@ The available APIs:
   nix profile install github:abysssol/ollama-flake#rocm
   ```
 
-The default API is `cpu`:
+The default is `cpu`:
 ``` shell
 # both of these are the default package, and are equivalent
 nix profile install github:abysssol/ollama-flake
