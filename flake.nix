@@ -20,7 +20,7 @@
   outputs = { self, nixpkgs, utils, gomod2nix, ollama, ... }:
     (utils.lib.eachDefaultSystem (system:
       let
-        name = "ollama";
+        pname = "ollama";
         version = "0.1.23-dev";
 
         pkgs = nixpkgs.legacyPackages.${system};
@@ -38,8 +38,8 @@
         };
 
         makeWrapper = wrapperLibs: ''
-          mv "$out/bin/${name}" "$out/bin/.${name}-unwrapped"
-          makeWrapper "$out/bin/.${name}-unwrapped" "$out/bin/${name}" \
+          mv "$out/bin/${pname}" "$out/bin/.${pname}-unwrapped"
+          makeWrapper "$out/bin/.${pname}-unwrapped" "$out/bin/${pname}" \
             --inherit-argv0 \
             --suffix LD_LIBRARY_PATH : "${lib.makeLibraryPath wrapperLibs}"
         '';
@@ -63,10 +63,10 @@
 
         buildOllama = mode:
           gomod2nix.legacyPackages.${system}.buildGoApplication (buildModes.${mode} // {
-            name = "${name}-${version}";
-            inherit system;
+            inherit pname version system;
+
             src = ollama;
-            pwd = ./.;
+            modules = ./gomod2nix.toml;
 
             nativeBuildInputs = [
               pkgs.cmake
