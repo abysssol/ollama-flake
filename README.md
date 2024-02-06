@@ -6,6 +6,7 @@ the version in [nixpkgs](https://github.com/nixos/nixpkgs) is updated.
 
 ### Contents
 - [Install](#install)
+  - [Version](#version)
   - [Backend](#backend)
 - [Update](#update)
 - [Remove](#remove)
@@ -23,19 +24,6 @@ Install ollama to user profile:
 nix profile install github:abysssol/ollama-flake
 ```
 
-Install a version that will only be updated in a backward compatible way, no breaking changes
-(see [semantic versioning](https://semver.org)):
-``` shell
-# append `/1` to follow branch `1` which tracks version 1.y.z of the repo
-nix profile install github:abysssol/ollama-flake/1
-# other versions may be available
-nix profile install github:abysssol/ollama-flake/0
-# use an unchanging tagged version
-nix profile install github:abysssol/ollama-flake/1.0.1
-# install a version built to run on AMD GPUs
-nix profile install github:abysssol/ollama-flake/1#rocm
-```
-
 Create a temporary shell with ollama:
 ``` shell
 nix shell github:abysssol/ollama-flake
@@ -47,14 +35,48 @@ Use as an input in another flake:
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     ollama = {
-      url = "github:abysssol/ollama-flake/1";
+      url = "github:abysssol/ollama-flake";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "utils";
     };
   };
+
+  # ### to access the rocm package of the ollama flake:
+  # ollama.packages.${system}.rocm # flake utils
+  # inputs'.ollama.packages.rocm # flake parts
 };
+```
+
+### Version
+
+You can specify a version by appending `/version` after the main url,
+where `version` is any branch or tag.
+The version branches will only be updated in a backward compatible way, no breaking changes
+(see [semantic versioning](https://semver.org)).
+
+Append `/1` to follow branch `1` which tracks version 1.y.z of the repo:
+``` shell
+nix profile install github:abysssol/ollama-flake/1
+```
+
+Use an unchanging tagged version:
+``` shell
+nix profile install github:abysssol/ollama-flake/1.1.0
+```
+
+Alternate packages can be specified as usual.
+From version 1, install the `cpu` package, which is built to only run on CPU:
+``` shell
+nix profile install github:abysssol/ollama-flake/1#cpu
+```
+
+Other versions may be available:
+``` shell
+nix profile install github:abysssol/ollama-flake/0
+nix profile install github:abysssol/ollama-flake/1.0.1
 ```
 
 ### Backend
@@ -70,14 +92,22 @@ The available options:
   ``` shell
   nix profile install github:abysssol/ollama-flake#rocm
   ```
+- `cuda`: supported by modern NVIDIA GPUs; uses unfree licensed libraries
+  ``` shell
+  nix profile install github:abysssol/ollama-flake#cuda
+  ```
+- `gpu`: build for both rocm and cuda, then dynamically load the relevant library at runtime
+  ``` shell
+  nix profile install github:abysssol/ollama-flake#gpu
+  ```
 
-The default is `cpu`:
+The default is `gpu`:
 ``` shell
 # both of these are the default package, and are equivalent
 nix profile install github:abysssol/ollama-flake
 nix profile install github:abysssol/ollama-flake#default
 # both of the above are equivalent to the one below
-nix profile install github:abysssol/ollama-flake#cpu
+nix profile install github:abysssol/ollama-flake#gpu
 ```
 
 
