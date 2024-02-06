@@ -39,6 +39,26 @@
         "type": "github"
       }
     },
+    "nixpkgs-unfree": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1701957584,
+        "narHash": "sha256-xEpFaRdrneHl3Xdyzp3emd4QVxML7AR3GC91wuWi0Ok=",
+        "owner": "numtide",
+        "repo": "nixpkgs-unfree",
+        "rev": "127b9b18583de04c6207c2a0e674abf64fc4a3b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "nixpkgs-unfree",
+        "type": "github"
+      }
+    },
     "ollama": {
       "flake": false,
       "locked": {
@@ -61,6 +81,7 @@
       "inputs": {
         "gomod2nix": "gomod2nix",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-unfree": "nixpkgs-unfree",
         "ollama": "ollama",
         "utils": "utils"
       }

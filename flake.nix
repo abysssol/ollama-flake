@@ -4,6 +4,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-unfree = {
+      url = "github:numtide/nixpkgs-unfree";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     utils.url = "github:numtide/flake-utils";
 
     gomod2nix = {
@@ -17,14 +21,16 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix, ollama, ... }:
+  outputs = { self, nixpkgs, nixpkgs-unfree, utils, gomod2nix, ollama, ... }:
     (utils.lib.eachDefaultSystem (system:
       let
         pname = "ollama";
         version = "0.1.23-dev";
 
         pkgs = nixpkgs.legacyPackages.${system};
+        pkgsUnfree = nixpkgs-unfree.legacyPackages.${system};
         inherit (pkgs) lib rocmPackages;
+        inherit (pkgsUnfree) cudaPackages linuxPackages;
 
         rocmClang = pkgs.linkFarm "rocm-clang" {
           llvm = rocmPackages.llvm.clang;
@@ -37,14 +43,39 @@
           ];
         };
 
+        cudaToolkit = pkgs.buildEnv {
+          name = "cuda-toolkit";
+          ignoreCollisions = true;
+          paths = [
+            cudaPackages.cudatoolkit
+            cudaPackages.cuda_cudart
+          ];
+        };
+
         makeWrapper = wrapperLibs: ''
           mv "$out/bin/${pname}" "$out/bin/.${pname}-unwrapped"
           makeWrapper "$out/bin/.${pname}-unwrapped" "$out/bin/${pname}" \
             --inherit-argv0 \
             --suffix LD_LIBRARY_PATH : "${lib.makeLibraryPath wrapperLibs}"
         '';
+        rocmLibs = [ rocmPackages.rocm-smi ];
+        cudaLibs = [ linuxPackages.nvidia_x11 ];
+        rocmVars = {
+          ROCM_PATH = rocmPath;
+          CLBlast_DIR = "${pkgs.clblast}/lib/cmake/CLBlast";
+        };
+        cudaVars = {
+          CUDA_LIB_DIR = "${cudaToolkit}/lib";
+          CUDACXX = "${cudaToolkit}/bin/nvcc";
+          CUDAToolkit_ROOT = cudaToolkit;
+        };
         buildModes = {
           cpu = { };
+
+          gpu = {
+            buildInputs = buildModes.rocm.buildInputs ++ buildModes.cuda.buildInputs;
+            postFixup = makeWrapper (rocmLibs ++ cudaLibs);
+          } // rocmVars // cudaVars;
 
           rocm = {
             buildInputs = [
@@ -55,10 +86,13 @@
               rocmPackages.rocsparse
               pkgs.libdrm
             ];
-            postFixup = makeWrapper [ rocmPackages.rocm-smi ];
-            ROCM_PATH = "${rocmPath}";
-            CLBlast_DIR = "${pkgs.clblast}/lib/cmake/CLBlast";
-          };
+            postFixup = makeWrapper rocmLibs;
+          } // rocmVars;
+
+          cuda = {
+            buildInputs = [ cudaPackages.cuda_cudart ];
+            postFixup = makeWrapper cudaLibs;
+          } // cudaVars;
         };
 
         buildOllama = mode:
@@ -71,6 +105,7 @@
             nativeBuildInputs = [
               pkgs.cmake
               pkgs.makeWrapper
+              pkgs.gcc12
             ];
             patches = [
               ./patch/disable-git-patching.patch
@@ -100,9 +135,11 @@
       in
       {
         packages = {
-          default = self.packages.${system}.cpu;
-          cpu = buildOllama "cpu";
+          default = self.packages.${system}.gpu;
+          gpu = buildOllama "gpu";
           rocm = buildOllama "rocm";
+          cuda = buildOllama "cuda";
+          cpu = buildOllama "cpu";
         };
 
         devShells.default = pkgs.mkShell {
