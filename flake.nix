@@ -25,7 +25,7 @@
     (utils.lib.eachDefaultSystem (system:
       let
         pname = "ollama";
-        version = "0.1.23-dev";
+        version = "0.1.23";
 
         pkgs = nixpkgs.legacyPackages.${system};
         pkgsUnfree = nixpkgs-unfree.legacyPackages.${system};
