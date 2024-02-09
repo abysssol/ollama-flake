@@ -62,16 +62,17 @@
     "ollama": {
       "flake": false,
       "locked": {
-        "lastModified": 1706905044,
-        "narHash": "sha256-+DABF5c/QpoCdu9aQvUE1kDP+sG7PssPSgvH8YfLycE=",
-        "ref": "refs/heads/main",
-        "rev": "f0e9496c85f67cdcba03a6e518117a93c69ae8f0",
-        "revCount": 1944,
+        "lastModified": 1707357331,
+        "narHash": "sha256-GwZA1QUH8I8m2bGToIcMMaB5MBnioQP4+n1SauUJYP8=",
+        "ref": "refs/tags/v0.1.24",
+        "rev": "69f392c9b7ea7c5cc3d46c29774e37fdef51abd8",
+        "revCount": 1967,
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jmorganca/ollama"
       },
       "original": {
+        "ref": "refs/tags/v0.1.24",
         "submodules": true,
         "type": "git",
         "url": "https://github.com/jmorganca/ollama"

@@ -16,7 +16,7 @@
       inputs.flake-utils.follows = "utils";
     };
     ollama = {
-      url = "git+https://github.com/jmorganca/ollama?submodules=1";
+      url = "git+https://github.com/jmorganca/ollama?ref=refs/tags/v0.1.24&submodules=1";
       flake = false;
     };
   };
@@ -30,7 +30,7 @@
       (system:
         let
           pname = "ollama";
-          version = "0.1.23";
+          version = "0.1.24";
 
           pkgs = nixpkgs.legacyPackages.${system};
           pkgsUnfree = nixpkgs-unfree.legacyPackages.${system};
