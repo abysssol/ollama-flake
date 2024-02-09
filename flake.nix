@@ -64,10 +64,7 @@
               --suffix LD_LIBRARY_PATH : "${lib.makeLibraryPath wrapperLibs}"
           '';
           rocmLibs = [ rocmPackages.rocm-smi ];
-          cudaLibs = [
-            linuxPackages.nvidia_x11
-            cudaPackages.cuda_cudart
-          ];
+          cudaLibs = [ linuxPackages.nvidia_x11 ];
           rocmVars = {
             ROCM_PATH = rocmPath;
             CLBlast_DIR = "${pkgs.clblast}/lib/cmake/CLBlast";
