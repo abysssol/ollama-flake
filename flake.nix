@@ -23,8 +23,8 @@
 
   outputs = { self, nixpkgs, nixpkgs-unfree, utils, gomod2nix, ollama, ... }:
     (utils.lib.eachSystem [
-      "x86_64-linux"
       "aarch64-linux"
+      "x86_64-linux"
       "i686-linux"
     ]
       (system:
@@ -109,21 +109,22 @@
 
               nativeBuildInputs = [
                 pkgs.cmake
-                pkgs.makeWrapper
                 pkgs.gcc12
+                pkgs.makeWrapper
               ];
               patches = [
-                ./patch/disable-git-patching.patch
-                ./patch/move-cache.patch
-                ./patch/server-shutdown.patch
-                ./patch/shutdown-utils.patch
+                ./patch/01-cache.patch
+                ./patch/02-shutdown.patch
+                ./patch/unique-main.patch
+                ./patch/remove-git.patch
               ];
               postPatch = ''
-                substituteInPlace llm/generate/gen_linux.sh \
-                  --subst-var-by cmakelistsPatch '${./patch/cmake-include.patch}'
+                substituteInPlace llm/generate/gen_common.sh \
+                  --subst-var-by cmakeIncludePatch '${./patch/cmake-include.patch}'
               '';
               preBuild = ''
                 export GOCACHE="$TMP/.cache/go-build"
+                export OLLAMA_SKIP_PATCHING=true
                 go generate ./...
               '';
               ldflags = [
