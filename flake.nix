@@ -134,8 +134,23 @@
               ];
             });
 
-          gomod2nixGenerate = pkgs.writeShellScriptBin "gomod2nix-generate" ''
+          generateGomod2nix = pkgs.writeShellScriptBin "generate-gomod2nix" ''
             exec ${gomod2nix.packages.${system}.default}/bin/gomod2nix generate --dir ${ollama} --outdir .
+          '';
+          generatePatches = pkgs.writeShellScriptBin "generate-patches" ''
+            workspace=$(mktemp -d)
+            a="$workspace/a"
+            b="$workspace/b"
+            cp -r '${ollama}' "$a"
+            chmod +rw -R "$a"
+            for patch in '${ollama}'/llm/patches/*.diff; do
+              diffname="$(basename -s .diff "$patch")"
+              cp -r "$a" "$b"
+              patch -p1 -d "$b/llm/llama.cpp" -i "$patch" --no-backup-if-mismatch
+              diff -Naru "$a" "$b" > "$startpath/patch/$diffname.patch"
+              rm -rf "$b"
+            done
+            rm -rf "$workspace"
           '';
         in
         {
@@ -148,7 +163,10 @@
           };
 
           devShells.default = pkgs.mkShell {
-            nativeBuildInputs = [ gomod2nixGenerate ];
+            nativeBuildInputs = [
+              generateGomod2nix
+              generatePatches
+            ];
           };
         }));
 }
