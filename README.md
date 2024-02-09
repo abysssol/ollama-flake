@@ -64,7 +64,7 @@ nix profile install github:abysssol/ollama-flake/1
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/1.1.0
+nix profile install github:abysssol/ollama-flake/1.2.0
 ```
 
 Alternate packages can be specified as usual.
@@ -76,7 +76,7 @@ nix profile install github:abysssol/ollama-flake/1#cpu
 Other versions may be available:
 ``` shell
 nix profile install github:abysssol/ollama-flake/0
-nix profile install github:abysssol/ollama-flake/1.0.1
+nix profile install github:abysssol/ollama-flake/1.1.0
 ```
 
 ### Backend
@@ -84,7 +84,7 @@ nix profile install github:abysssol/ollama-flake/1.0.1
 Multiple packages are available for the different backend implementations supported by ollama.
 
 The available options:
-- `cpu`: default CPU implementation
+- `cpu`: fallback CPU implementation
   ``` shell
   nix profile install github:abysssol/ollama-flake#cpu
   ```
