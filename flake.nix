@@ -121,6 +121,7 @@
               postPatch = ''
                 substituteInPlace llm/generate/gen_common.sh \
                   --subst-var-by cmakeIncludePatch '${./patch/cmake-include.patch}'
+                substituteInPlace version/version.go --replace 0.0.0 "${version}"
               '';
               preBuild = ''
                 export GOCACHE="$TMP/.cache/go-build"
@@ -130,7 +131,7 @@
               ldflags = [
                 "-s"
                 "-w"
-                "-X=github.com/jmorganca/ollama/version.Version=0.0.0"
+                "-X=github.com/jmorganca/ollama/version.Version=${version}"
                 "-X=github.com/jmorganca/ollama/server.mode=release"
               ];
             });
