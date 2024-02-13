@@ -1,7 +1,24 @@
 --- a/llm/generate/gen_common.sh
 +++ b/llm/generate/gen_common.sh
-@@ -60,26 +60,7 @@
+@@ -44,42 +44,10 @@
+     fi
  }
+ 
+-git_module_setup() {
+-    if [ -n "${OLLAMA_SKIP_PATCHING}" ]; then
+-        echo "Skipping submodule initialization"
+-        return
+-    fi
+-    # Make sure the tree is clean after the directory moves
+-    if [ -d "${LLAMACPP_DIR}/gguf" ]; then
+-        echo "Cleaning up old submodule"
+-        rm -rf ${LLAMACPP_DIR}
+-    fi
+-    git submodule init
+-    git submodule update --force ${LLAMACPP_DIR}
+-
+-}
++git_module_setup() { :; }
  
  apply_patches() {
 -    # Wire up our CMakefile
@@ -28,7 +45,7 @@
  }
  
  build() {
-@@ -112,14 +93,4 @@
+@@ -112,14 +80,4 @@
  }
  
  # Keep the local tree clean after we're done with the build
