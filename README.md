@@ -34,19 +34,21 @@ Use as an input in another flake:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    utils.url = "github:numtide/flake-utils";
-    flake-parts.url = "github:hercules-ci/flake-parts";
 
     ollama = {
       url = "github:abysssol/ollama-flake";
+      # this could potentially break the build
+      # if ollama doesn't build, try removing this
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.utils.follows = "utils";
     };
   };
 
   # ### to access the rocm package of the ollama flake:
-  # ollama.packages.${system}.rocm # flake utils
-  # inputs'.ollama.packages.rocm # flake parts
+  # ollama.packages.${system}.rocm
+  # inputs'.ollama.packages.rocm # with flake-parts
+
+  # ### you can override package inputs like with nixpkgs
+  # ollama.packages.${system}.cuda.override { cudaGcc = pkgs.gcc11; }
 };
 ```
 
@@ -64,7 +66,7 @@ nix profile install github:abysssol/ollama-flake/1
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/1.2.1
+nix profile install github:abysssol/ollama-flake/1.3.0
 ```
 
 Alternate packages can be specified as usual.
