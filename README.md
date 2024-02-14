@@ -38,8 +38,7 @@ Use as an input in another flake:
     ollama = {
       url = "github:abysssol/ollama-flake";
       # this could potentially break the build
-      # if ollama doesn't build, try removing this
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs"; # if ollama doesn't build, try removing this
     };
   };
 
