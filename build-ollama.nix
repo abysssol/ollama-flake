@@ -15,8 +15,8 @@
 , cudaPackages
 , linuxPackages
 
-, enableRocm ? stdenv.isLinux
-, enableCuda ? stdenv.isLinux
+, enableRocm ? false
+, enableCuda ? false
   # `nvcc` doesn't support the latest version of gcc
 , cudaGcc ? gcc12
 }:
