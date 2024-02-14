@@ -43,12 +43,20 @@ Use as an input in another flake:
     };
   };
 
-  # ### to access the rocm package of the ollama flake:
-  # ollama.packages.${system}.rocm
-  # inputs'.ollama.packages.rocm # with flake-parts
+  outputs = { nixpkgs, ollama, ... }:
+    let
+      system = abort "system needs to be set";
+      # to access the rocm package of the ollama flake:
+      ollama-rocm = ollama.packages.${system}.rocm;
+      #ollama-rocm = inputs'.ollama.packages.rocm; # with flake-parts
 
-  # ### you can override package inputs like with nixpkgs
-  # ollama.packages.${system}.cuda.override { cudaGcc = pkgs.gcc11; }
+      pkgs = nixpkgs.legacyPackages.${system};
+      # you can override package inputs like with nixpkgs
+      ollama-cuda = ollama.packages.${system}.cuda.override { cudaGcc = pkgs.gcc11; };
+    in
+    {
+      # output attributes go here
+    };
 };
 ```
 
