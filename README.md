@@ -37,8 +37,7 @@ Use as an input in another flake:
 
     ollama = {
       url = "github:abysssol/ollama-flake";
-      # this could potentially break the build
-      inputs.nixpkgs.follows = "nixpkgs"; # if ollama doesn't build, try removing this
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -73,7 +72,7 @@ nix profile install github:abysssol/ollama-flake/1
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/1.3.0
+nix profile install github:abysssol/ollama-flake/1.4.0
 ```
 
 Alternate packages can be specified as usual.
@@ -90,7 +89,9 @@ nix profile install github:abysssol/ollama-flake/1.1.0
 
 ### Backend
 
-Multiple packages are available for the different backend implementations supported by ollama.
+Multiple packages are available for the different computation backends supported by ollama on linux.
+On other platforms (eg darwin), only the default package is available.
+On darwin, gpu acceleration via metal should work by default.
 
 The available options:
 - `cpu`: fallback CPU implementation
