@@ -24,7 +24,6 @@
 
       unixPackages = (forAllSystems lib.platforms.unix (pkgs: _: {
         default = buildOllama pkgs { };
-        cpu = buildOllama pkgs { };
       }));
 
       linuxPackages = (forAllSystems lib.platforms.linux (pkgs: pkgsUnfree: {

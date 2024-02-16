@@ -1,63 +1,21 @@
 --- a/llm/generate/gen_common.sh
 +++ b/llm/generate/gen_common.sh
-@@ -44,42 +44,10 @@
-     fi
+@@ -60,6 +60,9 @@
  }
- 
--git_module_setup() {
--    if [ -n "${OLLAMA_SKIP_PATCHING}" ]; then
--        echo "Skipping submodule initialization"
--        return
--    fi
--    # Make sure the tree is clean after the directory moves
--    if [ -d "${LLAMACPP_DIR}/gguf" ]; then
--        echo "Cleaning up old submodule"
--        rm -rf ${LLAMACPP_DIR}
--    fi
--    git submodule init
--    git submodule update --force ${LLAMACPP_DIR}
--
--}
-+git_module_setup() { :; }
  
  apply_patches() {
--    # Wire up our CMakefile
--    if ! grep ollama ${LLAMACPP_DIR}/examples/server/CMakeLists.txt; then
--        echo 'include (../../../ext_server/CMakeLists.txt) # ollama' >>${LLAMACPP_DIR}/examples/server/CMakeLists.txt
--    fi
--
--    if [ -n "$(ls -A ../patches/*.diff)" ]; then
--        # apply temporary patches until fix is upstream
--        for patch in ../patches/*.diff; do
--            for file in $(grep "^+++ " ${patch} | cut -f2 -d' ' | cut -f2- -d/); do
--                (cd ${LLAMACPP_DIR}; git checkout ${file})
--            done
--        done
--        for patch in ../patches/*.diff; do
--            (cd ${LLAMACPP_DIR} && git apply ${patch})
--        done
--    fi
--
--    # Avoid duplicate main symbols when we link into the cgo binary
--    sed -e 's/int main(/int __main(/g' <${LLAMACPP_DIR}/examples/server/server.cpp >${LLAMACPP_DIR}/examples/server/server.cpp.tmp &&
--        mv ${LLAMACPP_DIR}/examples/server/server.cpp.tmp ${LLAMACPP_DIR}/examples/server/server.cpp
 +    patch -i '@cmakeIncludePatch@' "${LLAMACPP_DIR}/examples/server/CMakeLists.txt"
- }
- 
- build() {
-@@ -112,14 +80,4 @@
- }
++    return
++    
+     # Wire up our CMakefile
+     if ! grep ollama ${LLAMACPP_DIR}/examples/server/CMakeLists.txt; then
+         echo 'include (../../../ext_server/CMakeLists.txt) # ollama' >>${LLAMACPP_DIR}/examples/server/CMakeLists.txt
+@@ -113,6 +116,8 @@
  
  # Keep the local tree clean after we're done with the build
--cleanup() {
--    (cd ${LLAMACPP_DIR}/examples/server/ && git checkout CMakeLists.txt server.cpp)
--
--    if [ -n "$(ls -A ../patches/*.diff)" ]; then
--        for patch in ../patches/*.diff; do
--            for file in $(grep "^+++ " ${patch} | cut -f2 -d' ' | cut -f2- -d/); do
--                (cd ${LLAMACPP_DIR}; git checkout ${file})
--            done
--        done
--    fi
--}
-+cleanup() { :; }
+ cleanup() {
++    return
++
+     (cd ${LLAMACPP_DIR}/examples/server/ && git checkout CMakeLists.txt server.cpp)
+ 
+     if [ -n "$(ls -A ../patches/*.diff)" ]; then

@@ -1,6 +1,7 @@
 { lib
 , buildGoModule
 , fetchFromGitHub
+, fetchpatch
 , buildEnv
 , linkFarm
 , overrideCC
@@ -8,17 +9,17 @@
 , stdenv
 
 , cmake
-, gcc12
+, gcc11
 , clblast
 , libdrm
 , rocmPackages
 , cudaPackages
 , linuxPackages
+, darwin
 
 , enableRocm ? false
 , enableCuda ? false
-  # `nvcc` doesn't support the latest version of gcc
-, cudaGcc ? gcc12
+, cudaGcc ? gcc11
 }:
 
 let
@@ -26,52 +27,68 @@ let
   version = "0.1.24";
 
   warnIfNotLinux = warning: (lib.warnIfNot stdenv.isLinux warning stdenv.isLinux);
-  rocmIsEnabled = enableRocm && (warnIfNotLinux
-    "building ollama with rocm is only supported on linux; falling back to cpu");
-  cudaIsEnabled = enableCuda && (warnIfNotLinux
-    "building ollama with cuda is only supported on linux; falling back to cpu");
-  gpuIsEnabled = rocmIsEnabled || cudaIsEnabled;
+  gpuWarning = api: "building ollama with ${api} is only supported on linux; falling back to cpu";
+  rocmIsEnabled = enableRocm && (warnIfNotLinux (gpuWarning "rocm"));
+  cudaIsEnabled = enableCuda && (warnIfNotLinux (gpuWarning "cuda"));
+  enableLinuxGpu = rocmIsEnabled || cudaIsEnabled;
 
+  appleFrameworks = darwin.apple_sdk_11_0.frameworks;
+  metalFrameworks = [
+    appleFrameworks.Accelerate
+    appleFrameworks.Metal
+    appleFrameworks.MetalKit
+    appleFrameworks.MetalPerformanceShaders
+  ];
+
+  src = fetchFromGitHub {
+    owner = "jmorganca";
+    repo = "ollama";
+    rev = "v${version}";
+    hash = "sha256-GwZA1QUH8I8m2bGToIcMMaB5MBnioQP4+n1SauUJYP8=";
+    fetchSubmodules = true;
+  };
+  preparePatch = patch: hash: fetchpatch {
+    url = "file://${src}/llm/patches/${patch}";
+    inherit hash;
+    stripLen = 1;
+    extraPrefix = "llm/llama.cpp/";
+  };
   inherit (lib) licenses platforms maintainers;
   ollama = {
-    inherit pname version;
-
-    src = fetchFromGitHub {
-      owner = "jmorganca";
-      repo = "ollama";
-      rev = "v${version}";
-      hash = "sha256-GwZA1QUH8I8m2bGToIcMMaB5MBnioQP4+n1SauUJYP8=";
-      fetchSubmodules = true;
-    };
+    inherit pname version src;
     vendorHash = "sha256-wXRbfnkbeXPTOalm7SFLvHQ9j46S/yLNbFy+OWNSamQ=";
 
-    nativeBuildInputs = [ cmake ]
-      ++ (lib.optional gpuIsEnabled makeWrapper);
+    nativeBuildInputs = [
+      cmake
+    ] ++ lib.optionals enableLinuxGpu [
+      makeWrapper
+    ] ++ lib.optionals stdenv.isDarwin
+      metalFrameworks;
 
     patches = [
       # remove uses of `git` in the `go generate` script
       # instead use `patch` where necessary
       ./patch/remove-git.patch
+      # replace a hardcoded use of `g++` with `$CXX`
+      ./patch/replace-gcc.patch
 
       # ollama's patches of llama.cpp's example server
       # `ollama/llm/generate/gen_common.sh` -> "apply temporary patches until fix is upstream"
-
-      # created from `ollama/llm/patches/01-cache.diff`
-      ./patch/01-cache.patch
-      # created from `ollama/llm/patches/02-shutdown.diff`
-      ./patch/02-shutdown.patch
-
-      # `ollama/llm/generate/gen_common.sh` -> "avoid duplicate main symbols when we link into the cgo binary"
-      ./patch/unique-main.patch
+      (preparePatch "01-cache.diff" "sha256-PC4yN98hFvK+PEITiDihL8ki3bJuLVXrAm0CGf8GPJE=")
+      (preparePatch "02-shutdown.diff" "sha256-cElAp9Z9exxN964vB/YFuBhZoEcoAwGSMCnbh+l/V4Q=")
     ];
     postPatch = ''
       # use a patch from the nix store in the `go generate` script
       substituteInPlace llm/generate/gen_common.sh \
         --subst-var-by cmakeIncludePatch '${./patch/cmake-include.patch}'
+      # `ollama/llm/generate/gen_common.sh` -> "avoid duplicate main symbols when we link into the cgo binary"
+      substituteInPlace llm/llama.cpp/examples/server/server.cpp \
+        --replace-fail 'int main(' 'int __main('
       # replace inaccurate version number with actual release version
       substituteInPlace version/version.go --replace-fail 0.0.0 '${version}'
     '';
     preBuild = ''
+      export OLLAMA_SKIP_PATCHING=true
       # build llama.cpp libraries for ollama
       go generate ./...
     '';
@@ -83,12 +100,12 @@ let
       "-X=github.com/jmorganca/ollama/server.mode=release"
     ];
 
-    meta = with lib; {
+    meta = {
       description = "Get up and running with large language models locally";
       homepage = "https://github.com/jmorganca/ollama";
       license = licenses.mit;
       platforms = platforms.unix;
-      mainProgram = pname;
+      mainProgram = "ollama";
       maintainers = with maintainers; [ abysssol dit7ya elohmeier ];
     };
   };
@@ -123,22 +140,26 @@ let
     CUDAToolkit_ROOT = cudaToolkit;
   };
 
-  gpuBuildLibs = {
-    buildInputs = (lib.optionals rocmIsEnabled [
+  linuxGpuLibs = {
+    buildInputs = lib.optionals rocmIsEnabled [
       rocmPackages.clr
       rocmPackages.hipblas
       rocmPackages.rocblas
       rocmPackages.rocsolver
       rocmPackages.rocsparse
       libdrm
-    ])
-    ++ (lib.optional cudaIsEnabled
+    ] ++ lib.optionals cudaIsEnabled [
       cudaPackages.cuda_cudart
-    );
+    ];
   };
 
-  runtimeLibs = (lib.optional rocmIsEnabled rocmPackages.rocm-smi)
-    ++ (lib.optional cudaIsEnabled linuxPackages.nvidia_x11);
+  appleGpuLibs = { buildInputs = metalFrameworks; };
+
+  runtimeLibs = lib.optionals rocmIsEnabled [
+    rocmPackages.rocm-smi
+  ] ++ lib.optionals cudaIsEnabled [
+    linuxPackages.nvidia_x11
+  ];
   runtimeLibWrapper = {
     postFixup = ''
       mv "$out/bin/${pname}" "$out/bin/.${pname}-unwrapped"
@@ -156,5 +177,7 @@ in
 goBuild (ollama
   // (lib.optionalAttrs rocmIsEnabled rocmVars)
   // (lib.optionalAttrs cudaIsEnabled cudaVars)
-  // (lib.optionalAttrs gpuIsEnabled gpuBuildLibs)
-  // (lib.optionalAttrs gpuIsEnabled runtimeLibWrapper))
+  // (lib.optionalAttrs enableLinuxGpu linuxGpuLibs)
+  // (lib.optionalAttrs enableLinuxGpu runtimeLibWrapper)
+
+  // (lib.optionalAttrs stdenv.isDarwin appleGpuLibs))
