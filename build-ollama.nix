@@ -85,7 +85,7 @@ let
       substituteInPlace llm/llama.cpp/examples/server/server.cpp \
         --replace 'int main(' 'int __main('
       # replace inaccurate version number with actual release version
-      substituteInPlace version/version.go --replace-fail 0.0.0 '${version}'
+      substituteInPlace version/version.go --replace 0.0.0 '${version}'
     '';
     preBuild = ''
       export OLLAMA_SKIP_PATCHING=true
