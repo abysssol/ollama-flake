@@ -83,7 +83,7 @@ let
         --subst-var-by cmakeIncludePatch '${./patch/cmake-include.patch}'
       # `ollama/llm/generate/gen_common.sh` -> "avoid duplicate main symbols when we link into the cgo binary"
       substituteInPlace llm/llama.cpp/examples/server/server.cpp \
-        --replace-fail 'int main(' 'int __main('
+        --replace 'int main(' 'int __main('
       # replace inaccurate version number with actual release version
       substituteInPlace version/version.go --replace-fail 0.0.0 '${version}'
     '';
