@@ -23,7 +23,14 @@
 
 let
   pname = "ollama";
-  version = "0.1.26";
+  version = "0.1.27";
+  src = fetchFromGitHub {
+    owner = "jmorganca";
+    repo = "ollama";
+    rev = "v${version}";
+    hash = "sha256-+ayby+yVknFHLTyLjMAPMnOTMSzTKqzi9caN/TppcEg=";
+    fetchSubmodules = true;
+  };
 
   warnIfNotLinux = api: (lib.warnIfNot stdenv.isLinux
     "building ollama with `${api}` is only supported on linux; falling back to cpu"
@@ -71,14 +78,6 @@ let
       buildGoModule.override { stdenv = overrideCC stdenv gcc11; }
     else
       buildGoModule;
-
-  src = fetchFromGitHub {
-    owner = "jmorganca";
-    repo = "ollama";
-    rev = "v${version}";
-    hash = "sha256-Kw3tt9ayEMgI2V6OeaOkWfNwqfCL7MDD/nN5iXk5LnY=";
-    fetchSubmodules = true;
-  };
   preparePatch = patch: hash: fetchpatch {
     url = "file://${src}/llm/patches/${patch}";
     inherit hash;
@@ -151,7 +150,7 @@ goBuild ((lib.optionalAttrs rocmIsEnabled {
     # expose runtime libraries necessary to use the gpu
     mv "$out/bin/ollama" "$out/bin/.ollama-unwrapped"
     makeWrapper "$out/bin/.ollama-unwrapped" "$out/bin/ollama" \
-      --suffix LD_LIBRARY_PATH : '${lib.makeLibraryPath runtimeLibs}'
+      --suffix LD_LIBRARY_PATH : '/run/opengl-driver/lib:${lib.makeLibraryPath runtimeLibs}'
   '';
 
   ldflags = [
