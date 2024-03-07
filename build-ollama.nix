@@ -23,12 +23,12 @@
 
 let
   pname = "ollama";
-  version = "0.1.27";
+  version = "0.1.28";
   src = fetchFromGitHub {
-    owner = "jmorganca";
+    owner = "ollama";
     repo = "ollama";
     rev = "v${version}";
-    hash = "sha256-+ayby+yVknFHLTyLjMAPMnOTMSzTKqzi9caN/TppcEg=";
+    hash = "sha256-8f7veZitorNiqGBPJuf/Y36TcFK8Q75Vw4w6CeTk8qs=";
     fetchSubmodules = true;
   };
 
