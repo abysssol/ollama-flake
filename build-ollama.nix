@@ -95,7 +95,7 @@ goBuild ((lib.optionalAttrs rocmIsEnabled {
   CUDAToolkit_ROOT = cudaToolkit;
 }) // {
   inherit pname version src;
-  vendorHash = "sha256-zTrBighPBqZ9hhkEV3UawJZUYyPRay7+P6wkhDtpY7M=";
+  vendorHash = "sha256-DPIhDqE/yXpSQqrx07osMBMafK61yU2dl4cZhxSTvm8=";
 
   nativeBuildInputs = [
     cmake
