@@ -27,11 +27,10 @@
       }));
 
       linuxPackages = (forAllSystems lib.platforms.linux (pkgs: pkgsUnfree: {
-        default = buildOllama pkgsUnfree { enableRocm = true; enableCuda = true; };
-        gpu = buildOllama pkgsUnfree { enableRocm = true; enableCuda = true; };
-        rocm = buildOllama pkgs { enableRocm = true; };
-        cuda = buildOllama pkgsUnfree { enableCuda = true; };
-        cpu = buildOllama pkgs { };
+        default = buildOllama pkgsUnfree { };
+        rocm = buildOllama pkgs { acceleration = "rocm"; };
+        cuda = buildOllama pkgsUnfree { acceleration = "cuda"; };
+        cpu = buildOllama pkgs { acceleration = false; };
       }));
     in
     {
