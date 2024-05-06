@@ -1,7 +1,7 @@
 # Ollama Nix Flake
 
 This flake has been mostly abandoned, and won't receive consistent updates.
-The latest update to ollama version 0.1.32 is only because I haven't updated
+The latest update to ollama version 0.1.33 is only because I haven't updated
 the version of ollama in nixpkgs due to the rocm build being broken.
 So, I'm making it available here in the meantime.
 
@@ -75,7 +75,7 @@ nix profile install github:abysssol/ollama-flake/3
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3.0.0
+nix profile install github:abysssol/ollama-flake/3.1.0
 ```
 
 Alternate packages can be specified as usual.
