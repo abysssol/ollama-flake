@@ -73,20 +73,21 @@ let
   enableCuda = shouldEnable "cuda" config.cudaSupport;
 
 
+  rocmLibs = [
+    rocmPackages.clr
+    rocmPackages.hipblas
+    (rocmPackages.rocblas.override { tensileSepArch = true; tensileLazyLib = true; })
+    rocmPackages.rocsolver
+    rocmPackages.rocsparse
+    rocmPackages.rocm-device-libs
+    rocmPackages.rocm-smi
+  ];
   rocmClang = linkFarm "rocm-clang" {
     llvm = rocmPackages.llvm.clang;
   };
   rocmPath = buildEnv {
     name = "rocm-path";
-    paths = [
-      rocmPackages.clr
-      rocmPackages.hipblas
-      rocmPackages.rocblas
-      rocmPackages.rocsolver
-      rocmPackages.rocsparse
-      rocmPackages.rocm-device-libs
-      rocmClang
-    ];
+    paths = rocmLibs ++ [ rocmClang ];
   };
 
   cudaToolkit = buildEnv {
@@ -100,7 +101,7 @@ let
   };
 
   runtimeLibs = lib.optionals enableRocm [
-    rocmPackages.rocm-smi
+    rocmPath
   ] ++ lib.optionals enableCuda [
     linuxPackages.nvidia_x11
   ];
@@ -140,14 +141,9 @@ goBuild ((lib.optionalAttrs enableRocm {
   ] ++ lib.optionals stdenv.isDarwin
     metalFrameworks;
 
-  buildInputs = lib.optionals enableRocm [
-    rocmPackages.clr
-    rocmPackages.hipblas
-    rocmPackages.rocblas
-    rocmPackages.rocsolver
-    rocmPackages.rocsparse
-    libdrm
-  ] ++ lib.optionals enableCuda [
+  buildInputs = lib.optionals enableRocm
+    (rocmLibs ++ [ libdrm ])
+  ++ lib.optionals enableCuda [
     cudaPackages.cuda_cudart
   ] ++ lib.optionals stdenv.isDarwin
     metalFrameworks;
@@ -158,6 +154,9 @@ goBuild ((lib.optionalAttrs enableRocm {
     # this also disables necessary patches contained in `ollama/llm/patches/`
     # those patches are added to `llamacppPatches`, and reapplied here in the patch phase
     ./disable-git.patch
+    # disable a check that unnecessarily exits compilation during rocm builds
+    # since `rocmPath` is in `LD_LIBRARY_PATH`, ollama uses rocm correctly
+    ./disable-lib-check.patch
   ] ++ llamacppPatches;
   postPatch = ''
     # replace inaccurate version number with actual release version
@@ -193,7 +192,6 @@ goBuild ((lib.optionalAttrs enableRocm {
     homepage = "https://github.com/ollama/ollama";
     changelog = "https://github.com/ollama/ollama/releases/tag/v${version}";
     license = licenses.mit;
-    broken = enableRocm;
     platforms = platforms.unix;
     mainProgram = "ollama";
     maintainers = with maintainers; [ abysssol dit7ya elohmeier ];

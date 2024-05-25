@@ -1,9 +1,6 @@
 # Ollama Nix Flake
 
 This flake has been mostly abandoned, and won't receive consistent updates.
-The latest update to ollama version 0.1.37 is only because I haven't updated
-the version of ollama in nixpkgs due to the rocm build being broken.
-So, I'm making it available here in the meantime.
 
 A flake for the latest release of [ollama](https://github.com/jmorganca/ollama).
 It's purpose is to build the most recent version supporting new models until
@@ -75,7 +72,7 @@ nix profile install github:abysssol/ollama-flake/3
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3.2.0
+nix profile install github:abysssol/ollama-flake/3.3.0
 ```
 
 Alternate packages can be specified as usual.
@@ -116,7 +113,7 @@ The default builds for cpu:
 nix profile install github:abysssol/ollama-flake
 nix profile install github:abysssol/ollama-flake#default
 # both of the above are equivalent to the one below
-nix profile install github:abysssol/ollama-flake#gpu
+nix profile install github:abysssol/ollama-flake#cpu
 ```
 
 
