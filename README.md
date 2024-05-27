@@ -72,7 +72,7 @@ nix profile install github:abysssol/ollama-flake/3
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3.3.0
+nix profile install github:abysssol/ollama-flake/3.4.0
 ```
 
 Alternate packages can be specified as usual.
@@ -98,11 +98,11 @@ The available options:
   ``` shell
   nix profile install github:abysssol/ollama-flake#cpu
   ```
-- `rocm`: supported by modern AMD GPUs
+- `rocm`: supported by most modern AMD GPUs
   ``` shell
   nix profile install github:abysssol/ollama-flake#rocm
   ```
-- `cuda`: supported by modern NVIDIA GPUs; uses unfree licensed libraries
+- `cuda`: supported by most modern NVIDIA GPUs; uses unfree licensed libraries
   ``` shell
   nix profile install github:abysssol/ollama-flake#cuda
   ```
