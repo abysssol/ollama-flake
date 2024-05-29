@@ -72,7 +72,7 @@ nix profile install github:abysssol/ollama-flake/3
 
 Use an unchanging tagged version:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3.4.0
+nix profile install github:abysssol/ollama-flake/3.4.1
 ```
 
 Alternate packages can be specified as usual.
