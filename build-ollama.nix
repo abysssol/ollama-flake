@@ -25,16 +25,16 @@
 let
   pname = "ollama";
   # don't forget to invalidate all hashes each update
-  version = "0.1.39";
+  version = "0.1.43";
 
   src = fetchFromGitHub {
     owner = "ollama";
     repo = "ollama";
     rev = "v${version}";
-    hash = "sha256-OYWHpPvnIgdjDjpcV8BKnr5cq6eJzBsAOGZmaVBBalQ=";
+    hash = "sha256-+WCyRZPm4EyLH68uXDUJEW76v6FXq2WS5fqt4momKDA=";
     fetchSubmodules = true;
   };
-  vendorHash = "sha256-bomHpEcoHG/xUGgzrFXB9D3np0ainTX066SCMY+NdnA=";
+  vendorHash = "sha256-LNH3mpxIrPMe5emfum1W10jvXIjKC6GkGcjq1HhpJQo=";
   # ollama's patches of llama.cpp's example server
   # `ollama/llm/generate/gen_common.sh` -> "apply temporary patches until fix is upstream"
   # each update, these patches should be synchronized with the contents of `ollama/llm/patches/`
