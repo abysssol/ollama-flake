@@ -14,24 +14,26 @@
     let
       inherit (nixpkgs) lib;
 
-      forAllSystems = systems: function:
+      forAllSystems = systems: buildPackages:
         lib.genAttrs systems (system:
-          function
-            nixpkgs.legacyPackages.${system}
-            nixpkgs-unfree.legacyPackages.${system});
+          buildPackages nixpkgs-unfree.legacyPackages.${system});
 
-      buildOllama = pkgs: overrides: pkgs.callPackage ./build-ollama.nix overrides;
+      buildPackages = systems: packageOverrides:
+        forAllSystems systems (pkgs:
+          builtins.mapAttrs
+            (_: pkgs.callPackage ./package.nix)
+            (packageOverrides pkgs));
 
-      unixPackages = (forAllSystems lib.platforms.unix (pkgs: _: {
-        default = buildOllama pkgs { };
-      }));
+      unixPackages = buildPackages lib.platforms.unix (pkgs: {
+        default = { };
+      });
 
-      linuxPackages = (forAllSystems lib.platforms.linux (pkgs: pkgsUnfree: {
-        default = buildOllama pkgsUnfree { };
-        rocm = buildOllama pkgs { acceleration = "rocm"; };
-        cuda = buildOllama pkgsUnfree { acceleration = "cuda"; };
-        cpu = buildOllama pkgs { acceleration = false; };
-      }));
+      linuxPackages = buildPackages lib.platforms.linux (pkgs: {
+        default = { };
+        rocm = { acceleration = "rocm"; };
+        cuda = { acceleration = "cuda"; };
+        cpu = { acceleration = false; };
+      });
     in
     {
       packages = unixPackages // linuxPackages;
