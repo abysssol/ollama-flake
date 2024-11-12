@@ -146,9 +146,7 @@ goBuild {
       CLBlast_DIR = "${clblast}/lib/cmake/CLBlast";
       HIP_PATH = rocmPath;
     }
-    // lib.optionalAttrs enableCuda {
-      CUDA_PATH = "${cudaPath}";
-    };
+    // lib.optionalAttrs enableCuda { CUDA_PATH = "${cudaPath}"; };
 
   nativeBuildInputs =
     [
