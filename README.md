@@ -37,7 +37,7 @@ Use as an input in another flake:
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-    ollama.url = "github:abysssol/ollama-flake";
+    ollama.url = "github:abysssol/ollama-flake/5";
     #ollama.inputs.nixpkgs.follows = "nixpkgs"; # this could break the build unless using unstable nixpkgs
   };
 
@@ -65,9 +65,9 @@ where `<version>` is any branch or tag.
 The version branches will only be updated in a backward compatible way, no breaking changes
 (see [semantic versioning](https://semver.org)).
 
-Append `/3` to follow branch `3` which tracks version 3.y.z of the repo:
+Append `/5` to follow branch `5` which tracks version 5.y.z of the repo:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3
+nix profile install github:abysssol/ollama-flake/5
 ```
 
 Use an unchanging tagged version:
@@ -76,9 +76,9 @@ nix profile install github:abysssol/ollama-flake/3.5.0
 ```
 
 Alternate packages can be specified as usual.
-From version 3, install the `cpu` package, which is built to only run on CPU:
+From version 5, install the `cpu` package, which is built to only run on CPU:
 ``` shell
-nix profile install github:abysssol/ollama-flake/3#cpu
+nix profile install github:abysssol/ollama-flake/5#cpu
 ```
 
 Other versions may be available:
@@ -99,6 +99,7 @@ The available options:
   nix profile install github:abysssol/ollama-flake#cpu
   ```
 - `rocm`: supported by most modern AMD GPUs
+  Not available for 5.0.0 (ollama 0.4.2) due to build failure (see https://github.com/ollama/ollama/issues/7565)
   ``` shell
   nix profile install github:abysssol/ollama-flake#rocm
   ```
