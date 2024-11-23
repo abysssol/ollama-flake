@@ -65,6 +65,9 @@ where `<version>` is any branch or tag.
 The version branches will only be updated in a backward compatible way, no breaking changes
 (see [semantic versioning](https://semver.org)).
 
+The versions used *are not* the same as upstream ollama: they are specific to this repository.
+However, a new major version will be used whenever upstream ollama makes a breaking release.
+
 Append `/5` to follow branch `5` which tracks version 5.y.z of the repo:
 ``` shell
 nix profile install github:abysssol/ollama-flake/5
