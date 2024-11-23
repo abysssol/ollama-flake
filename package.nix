@@ -185,7 +185,8 @@ goBuild {
 
   preBuild = ''
     # build llama.cpp libraries for ollama
-    make -j 5
+    threads="$(nproc)"
+    make -j $((threads * 3 / 4))
   '';
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
