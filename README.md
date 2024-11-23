@@ -99,7 +99,6 @@ The available options:
   nix profile install github:abysssol/ollama-flake#cpu
   ```
 - `rocm`: supported by most modern AMD GPUs
-  Not available for 5.0.0 (ollama 0.4.2) due to build failure (see https://github.com/ollama/ollama/issues/7565)
   ``` shell
   nix profile install github:abysssol/ollama-flake#rocm
   ```
@@ -108,13 +107,12 @@ The available options:
   nix profile install github:abysssol/ollama-flake#cuda
   ```
 
-The default builds for cpu:
+The default build may be for cpu, but may be for rocm or cuda if
+one of `nixpkgs.config.rocmSupport` or `nixpkgs.config.cudaSupport` is enabled:
 ``` shell
-# both of these are the default package, and are equivalent
+# both of these are the default package, and are equivalent expressions
 nix profile install github:abysssol/ollama-flake
 nix profile install github:abysssol/ollama-flake#default
-# both of the above are equivalent to the one below
-nix profile install github:abysssol/ollama-flake#cpu
 ```
 
 
