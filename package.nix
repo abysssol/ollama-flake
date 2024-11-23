@@ -41,17 +41,17 @@ assert builtins.elem acceleration [
 let
   pname = "ollama";
   # don't forget to invalidate all hashes each update
-  version = "0.4.2";
+  version = "0.4.4";
 
   src = fetchFromGitHub {
     owner = "ollama";
     repo = "ollama";
     rev = "v${version}";
-    hash = "sha256-O36ngdRsMph/qFZ+xbzkOtAcFag2uSDbyIf1/koX6eA=";
+    hash = "sha256-yyUm9kETNQiJjpGeVLPe67G2CrEKYNcrPFixqqq+rH4=";
     fetchSubmodules = true;
   };
 
-  vendorHash = "sha256-HWIKKXJKCG+B+sQRM3izVhT59qqnKfObDchFWocIfFk=";
+  vendorHash = "sha256-1+Eb81QQcVANQQ5u1c6is8dLVGYqrXKuFnF2MBkEHms=";
 
   validateFallback = lib.warnIf (config.rocmSupport && config.cudaSupport) (lib.concatStrings [
     "both `nixpkgs.config.rocmSupport` and `nixpkgs.config.cudaSupport` are enabled, "
@@ -153,7 +153,7 @@ goBuild {
       cmake
       gitMinimal
     ]
-    ++ lib.optionals enableRocm [ rocmPackages.llvm.bintools ]
+    ++ lib.optionals enableRocm [ rocmPackages.llvm.bintools rocmLibs ]
     ++ lib.optionals enableCuda [ cudaPackages.cuda_nvcc ]
     ++ lib.optionals (enableRocm || enableCuda) [
       makeWrapper
@@ -165,6 +165,11 @@ goBuild {
     lib.optionals enableRocm (rocmLibs ++ [ libdrm ])
     ++ lib.optionals enableCuda cudaLibs
     ++ lib.optionals stdenv.hostPlatform.isDarwin metalFrameworks;
+
+  patches = [
+    # sin-eating: ollama's build script is unable to find hipcc
+    ./rocm.patch
+  ];
 
   postPatch = ''
     # replace inaccurate version number with actual release version

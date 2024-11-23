@@ -30,6 +30,9 @@
 
       linuxPackages = buildPackages lib.platforms.linux (pkgs: {
         default = { };
+        rocm = {
+          acceleration = "rocm";
+        };
         cuda = {
           acceleration = "cuda";
         };
