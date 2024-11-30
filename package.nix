@@ -92,9 +92,7 @@ let
 
   cudaToolkit = buildEnv {
     # ollama hardcodes the major version in the Makefile to support different variants.
-    # - https://github.com/ollama/ollama/blob/v0.4.1/llama/Makefile#L17-L18
-    # - https://github.com/ollama/ollama/blob/v0.4.1/llama/make/Makefile.cuda_v12#L8
-    # - https://github.com/ollama/ollama/blob/v0.4.1/llama/make/Makefile.cuda_v11#L8
+    # - https://github.com/ollama/ollama/blob/v0.4.4/llama/Makefile#L17-L18
     name = "cuda-merged-${cudaMajorVersion}";
     paths = map lib.getLib cudaLibs ++ [
       (lib.getOutput "static" cudaPackages.cuda_cudart)
@@ -146,14 +144,17 @@ goBuild {
       CLBlast_DIR = "${clblast}/lib/cmake/CLBlast";
       HIP_PATH = rocmPath;
     }
-    // lib.optionalAttrs enableCuda { CUDA_PATH = "${cudaPath}"; };
+    // lib.optionalAttrs enableCuda { CUDA_PATH = cudaPath; };
 
   nativeBuildInputs =
     [
       cmake
       gitMinimal
     ]
-    ++ lib.optionals enableRocm [ rocmPackages.llvm.bintools rocmLibs ]
+    ++ lib.optionals enableRocm [
+      rocmPackages.llvm.bintools
+      rocmLibs
+    ]
     ++ lib.optionals enableCuda [ cudaPackages.cuda_nvcc ]
     ++ lib.optionals (enableRocm || enableCuda) [
       makeWrapper
@@ -185,13 +186,12 @@ goBuild {
 
   preBuild = ''
     # build llama.cpp libraries for ollama
-    threads="$(nproc)"
-    make -j $((threads * 3 / 4))
+    make -j $NIX_BUILD_CORES
   '';
 
   postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
     # copy libggml_*.so and runners into lib
-    # https://github.com/ollama/ollama/blob/v0.4.1/llama/make/gpu.make#L90
+    # https://github.com/ollama/ollama/blob/v0.4.4/llama/make/gpu.make#L90
     mkdir -p $out/lib
     cp -r dist/*/lib/* $out/lib/
   '';
